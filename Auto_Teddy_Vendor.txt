@@ -1,0 +1,33 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.23;
+
+contract AutomatedVending {
+
+
+    address public owner;
+    mapping (address => uint) public teddyBalances;
+
+    constructor() {
+        owner = msg.sender;
+        teddyBalances[address(this)] = 100;
+    }
+
+    function getVendingMachineBalance() public view returns (uint) {
+        return teddyBalances[address(this)];
+    }
+
+
+    function restock(uint amount) public {
+        require(msg.sender == owner, "Only the owner can restock.");
+        teddyBalances[address(this)] += amount;
+    }
+
+
+    function purchase(uint amount) public payable {
+        require(msg.value >= amount * 2 ether, "You must pay at least 2 ETH per Teddy");
+        require(teddyBalances[address(this)] >= amount, "Not enough Teddies in stock to complete this purchase");
+        teddyBalances[address(this)] -= amount;
+        teddyBalances[msg.sender] += amount;
+    }
+}
+
